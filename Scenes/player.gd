@@ -100,7 +100,6 @@ func _physics_process(delta):
 
 	# Trigger attack on key press (e.g. X key or gamepad button)
 	if Input.is_action_just_pressed("attack") and not is_attacking:
-		print("Attack key pressed!")
 		start_attack()
 	
 	# Update speed label text (rounded horizontal speed)

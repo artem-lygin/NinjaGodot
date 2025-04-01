@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://crupy4ja7j1gy"]
+[gd_scene load_steps=3 format=3 uid="uid://crupy4ja7j1gy"]
 
 [ext_resource type="Script" uid="uid://dirqpoolfju2f" path="res://Scenes/damage_label.gd" id="1_3usr7"]
+[ext_resource type="FontFile" uid="uid://cptwgg08i1wor" path="res://Fonts/PixelifySans-Medium.ttf" id="1_26nnv"]
 
 [node name="DamageLabel" type="Label"]
 z_index = 1000
@@ -16,5 +17,8 @@ offset_right = -536.0
 offset_bottom = -299.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.784314)
+theme_override_constants/outline_size = 2
+theme_override_fonts/font = ExtResource("1_26nnv")
 horizontal_alignment = 1
 script = ExtResource("1_3usr7")
