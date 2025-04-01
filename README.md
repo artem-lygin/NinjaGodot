@@ -1,11 +1,12 @@
 # Simple Platformer (Godot)
 
-A simple 2D platformer made with Godot where the player — a ball — navigates through platforms, attacks dummies, and reaches the goal.
+A simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks dummies, and reaches the goal.
 
 ## 🚀 Gameplay
 
 - Use arrow keys to move.
-- Press a key (likely space or another input) to attack with a sword.
+- Press A to jump (with doublejump).
+- Press X to attack with a sword.
 - The player can deal damage, with a chance for critical hits.
 - Dummies (enemies) can receive damage and die.
 - Reaching the goal zone likely finishes the level.
