@@ -58,7 +58,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"attack",
-"speed": 16.0
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -226,7 +226,9 @@ position_smoothing_enabled = true
 
 [node name="PlayerAnimatedSprite" type="AnimatedSprite2D" parent="Player"]
 sprite_frames = SubResource("SpriteFrames_3pmx8")
-animation = &"jump"
+animation = &"attack"
+frame = 3
+frame_progress = 0.902326
 
 [node name="SpeedLabel" type="Label" parent="Player"]
 visible = false

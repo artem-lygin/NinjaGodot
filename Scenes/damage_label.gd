@@ -1,9 +1,17 @@
 extends Label
 
-func show_damage(value: int) -> void:
+func show_damage(value: int, is_crit: bool = false) -> void:
 	text = "-" + str(value)
 	modulate.a = 1.0
 	position = Vector2(-20, -36)  # Start above dummy center
+
+	# Change color if crit
+	if is_crit:
+		add_theme_color_override("font_color", Color("FFD700"))
+		add_theme_font_size_override("font_size", 20)
+	else:
+		add_theme_color_override("font_color", Color("white"))
+		add_theme_font_size_override("font_size", 16)
 
 	var tween = create_tween()
 	tween.set_parallel()

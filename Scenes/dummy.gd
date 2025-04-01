@@ -3,7 +3,7 @@ extends CharacterBody2D
 const SPEED = 40  # How fast the dummy moves
 const GRAVITY = 800.0  # Match this to your player’s gravity
 
-var max_hp = 30
+var max_hp = 60
 var current_hp = max_hp
 var direction = -1  # Start facing left (-1 for left, 1 for right)
 var hit_direction := 0 # Directon of the hit tooked
@@ -12,6 +12,7 @@ var DamageLabelScene := preload("res://Scenes/DamageLabel.tscn")
 var CritLabelScene := preload("res://Scenes/CritLabel.tscn")
 var is_dead = false # Dummy can die
 var is_stunned = false # Dummy can be stunned (for knokback)
+var recently_hit := false # For avoinding several take_damage from one hit
 
 @onready var health_bar = $HealthBar
 @onready var bar_style = health_bar.get("theme_override_styles/fill")
@@ -67,6 +68,12 @@ func _ready():
 	# Connect to the sword hitbox signal (in Player scene)
 	connect("area_entered", Callable(self, "_on_hit"))
 	
+	# Sync health bar to max HP
+	health_bar.max_value = max_hp
+	health_bar.value = max_hp
+	
+	# initialize_health(120)  # Overrides default value
+	
 	# Null Check on HealtBar style
 	if health_bar.get("theme_override_styles/fill") == null:
 		health_bar.add_theme_stylebox_override("fill", StyleBoxFlat.new())
@@ -79,6 +86,12 @@ func _ready():
 	# Hide HealthBar if full
 	if current_hp >= max_hp:
 		health_bar.visible = false
+
+func initialize_health(hp: int) -> void:
+	max_hp = hp
+	current_hp = hp
+	health_bar.max_value = hp
+	health_bar.value = hp
 
 # Update color based on current HP in take_damage()
 func update_health_color():
@@ -110,64 +123,27 @@ func shake_health_bar():
 		original_pos,
 		duration
 	).set_delay(duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	
-# Called when something enters the dummy's HurtBox (an Area2D child)
-func _on_HurtBox_area_entered(area: Area2D) -> void:
-	# Default direction if something fails
-	var direction_from_attacker = 0
-	
-	# Check if the area is the SwordHitbox
-	if area.name == "SwordHitbox":
-		# Get the player (parent of the sword)
-		var player = area.get_parent()
-
-		# Safely try to get facing_direction from the player
-		if "facing_direction" in player:
-			direction_from_attacker = player.facing_direction
-		else:
-			print("⚠️ Could not access facing_direction from player, using default 0.")
-		# Store for use on death
-		hit_direction = direction_from_attacker
-		
-		# 🧠 CRIT CHANCE
-		var is_crit = randf() < 0.25  # 25% chance
-		var base_damage = 10
-		var damage = base_damage * 3 if is_crit else base_damage
-
-		# Debug log
-		print("🗡️ Dummy hit from direction:", hit_direction)
-
-		# Apply damage and knockback
-		take_damage(damage, is_crit)
 
 # Handles the logic for taking damage
-func take_damage(amount: int, is_crit: bool = false) -> void:
-	# Subtract the incoming damage from current health
-	current_hp -= amount
+func take_damage(amount: int, attacker_direction: int, is_crit: bool = false) -> void:
+	
+	hit_direction = attacker_direction
+	current_hp -= amount # Subtract the incoming damage from current health
+	
 	# If health drops to 0 or below, play die
 	if current_hp <= 0 and not is_dead:
 		die()
 		# return  # exit early, skip stun/flash
 	
-	show_damage_label(amount) # Call Show damage label
-	if is_crit:
-		var crit_label = CritLabelScene.instantiate()
-		add_child(crit_label)
-		crit_label.show_crit("CRIT!")
+	show_damage_label(amount, is_crit) # Call Show damage label
 	update_health_color() # Call changing health bar color depending on remaining HP
 	shake_health_bar() # Call Shake the health bar to give visual feedback
-	# shake_on_hit() #Call Shaking on hit
 	
 	# Flash red briefly on hit
 	modulate = Color(1.0, 0.5, 0.5)  # Light red tint
 	# Wait 0.1 sec then restore normal color
 	await get_tree().create_timer(0.1).timeout
 	modulate = Color(1, 1, 1)
-	
-	# Same modulation for the sprite
-	# foe_sprite.modulate = Color(1.0, 0.5, 0.5)
-	# await get_tree().create_timer(0.1).timeout
-	# foe_sprite.modulate = Color(1, 1, 1)
 	
 	# Update the visual health bar to reflect the new health
 	health_bar.value = current_hp
@@ -223,10 +199,22 @@ func die() -> void:
 	queue_free()
 
 # Damage Label logic
-func show_damage_label(amount: int) -> void:
+func show_damage_label(amount: int, is_crit: bool = false) -> void:
 	var label = DamageLabelScene.instantiate()
 	add_child(label)
 	label.show_damage(amount)
+	
+	# Debug Crit Label appearnce
+	#var crit_label = CritLabelScene.instantiate()
+	#add_child(crit_label)
+	#crit_label.show_crit("TEST CRIT!")
+	
+	if is_crit:
+		await get_tree().create_timer(0.15).timeout  # ← 150ms delay
+		print("🔥 Showing CRIT label!")  # Debug log
+		var crit_label = CritLabelScene.instantiate()
+		add_child(crit_label)
+		crit_label.show_crit("CRIT!")
 
 # Shake Dummy on hit
 func shake_on_hit():

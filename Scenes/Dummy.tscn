@@ -105,8 +105,6 @@ offset_top = -33.0
 offset_right = 15.0
 offset_bottom = -29.0
 grow_horizontal = 2
-max_value = 30.0
-value = 30.0
 show_percentage = false
 
 [node name="RayCast2D_Ground" type="RayCast2D" parent="Dummy"]

@@ -33,19 +33,23 @@ func _ready():
 	start_position = global_position
 	
 func start_attack():
+	if is_attacking: # Check if player already in attack
+		return
+
 	is_attacking = true
 	
 	# Activate hitbox only during attack
 	sword_shape.disabled = false
-	sword_hitbox.monitoring = true
+	sword_hitbox.monitoring = true # Enable collisions for this attack
 
 	# Play attack animation
 	sprite.play("attack")
 	
-	await get_tree().create_timer(0.2).timeout  # ← match animation length
+	await get_tree().create_timer(0.1).timeout  # ← match animation length
 	# Deactivate hitbox
-	sword_hitbox.monitoring = false
+	sword_hitbox.monitoring = false # Disable immediately after hit window
 	sword_shape.disabled = true
+	await get_tree().create_timer(0.2).timeout  # Let animation finish
 	is_attacking = false
 
 func _physics_process(delta):

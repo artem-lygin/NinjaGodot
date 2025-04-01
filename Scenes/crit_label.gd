@@ -12,8 +12,8 @@ func show_crit(text := "CRIT!"):
 	# Animate float up + fade out
 	var tween = create_tween()
 	tween.set_parallel()
-	tween.tween_property(self, "position", Vector2(-20, -128), 1.2).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(self, "modulate:a", 0.0, 1.2).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(self, "position", Vector2(-20, -128), 1.8).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(self, "modulate:a", 0.0, 1.8).set_trans(Tween.TRANS_SINE)
 	
 	# Add shake effect (left-right jitter)
 	var shake_tween = create_tween()
