@@ -56,12 +56,3 @@ Detects enemies in the attack area and applies damage.
 
 ### `GoalZone.gd`
 - When the player enters the area, the game reacts (likely ends or triggers victory)
-
----
-
-Would you like me to create:
-- A proper `README.md` file you can push to GitHub?
-- Internal documentation for each `.gd` script?
-- A dev diary format for tracking progress?
-
-Let me know how you'd like to proceed! &#8203;:contentReference[oaicite:0]{index=0}&#8203;
