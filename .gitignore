@@ -5,4 +5,6 @@
 *.tmp
 *.translation
 .mono/
+
+# MacOS file system ignores
 .DS_Store
