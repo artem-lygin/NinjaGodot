@@ -12,8 +12,8 @@ const BASE_DAMAGE = 10
 # Store the player's starting position when the scene loads
 var start_position: Vector2
 var max_jumps = 2       # How many jumps allowed
-var jumps_left = 2      # How many jumps remaining
-var was_on_floor = false # For double Jump Performing 
+var jumps_remaining = max_jumps      # How many jumps remaining
+var was_on_floor = true # For double Jump Performing 
 var is_attacking = false # Is Player Attacking?
 var input_direction = 0 # Starting input direction -1 is ← back, 0 no input and 1 is forward →
 var facing_direction = 1  # Direction of the Player 1 = right, -1 = left
@@ -57,7 +57,7 @@ func _physics_process(delta):
 	
 	# If on the floor, refill jumps
 	if is_on_floor():
-		jumps_left = max_jumps
+		jumps_remaining = max_jumps
 
 	# Gravity
 	velocity.y += GRAVITY * delta
@@ -93,14 +93,14 @@ func _physics_process(delta):
 		velocity.x = move_toward(velocity.x, 0, FRICTION * delta)
 
 	# Jump if jump key is pressed and we have jumps left
-	if Input.is_action_just_pressed("jump") and jumps_left > 0:
+	if Input.is_action_just_pressed("jump") and jumps_remaining > 0:
 		# Jump
 		velocity.y = JUMP_FORCE
 		# Trigger dust only if this is the second jump (i.e. midair jump)
-		if jumps_left == 1:
+		if jumps_remaining == 1:
 			dust.restart()
 		# Use up one jump
-		jumps_left -= 1
+		jumps_remaining -= 1
 
 	# Trigger attack on key press (e.g. X key or gamepad button)
 	if Input.is_action_just_pressed("attack") and not is_attacking:
@@ -109,7 +109,7 @@ func _physics_process(delta):
 	# Update speed label text (rounded horizontal speed)
 	speed_label.text = str(round(velocity.x))
 	# Update Jumps Remaining UI (rounded horizontal speed)
-	jump_label.text = "Jumps: " + str(jumps_left)
+	jump_label.text = "Jumps: " + str(jumps_remaining)
 	
 	# Animation state logic
 	if not is_attacking:
@@ -122,8 +122,15 @@ func _physics_process(delta):
 		
 	# Reset Double Jump counter
 	if is_on_floor() and not was_on_floor:
-		jumps_left = max_jumps
-		
+		jumps_remaining = max_jumps
+	
+	# Check grounded status transition
+	if was_on_floor and not is_on_floor():
+		# Just walked off a platform — use one jump
+		if jumps_remaining == max_jumps:
+			jumps_remaining -= 1
+			print("💨 Walked off ledge — used one jump")
+	
 	# Update the flag for the next frame
 	was_on_floor = is_on_floor()
 

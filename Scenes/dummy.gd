@@ -158,7 +158,19 @@ func take_damage(amount: int, attacker_direction: int, is_crit: bool = false) ->
 	if not is_dead:
 		is_stunned = true
 		print("Dummy stunned")
-		velocity.x = 50 * hit_direction
+		# Proportional knockback based on damage / max_hp
+		var knockback_ratio: float = clamp(float(amount) / float(max_hp), 0.0, 1.0)
+		var scaled_ratio := pow(knockback_ratio, 3.0)
+		# Scaled Ratio Options
+		# Linear		x 						Consistent scaling
+		# Exponential 	pow(x, 2.0) 			Punchier high-end, weak low-end
+		# Steeper 		pow(x, 3.0) 			Only massive hits cause knockback
+		# SmoothStep	x * x * (3 - 2 * x)		Smooth S-curve easing
+		var knockback_strength: float = lerp(30, 200, scaled_ratio)
+
+		# Knock direction
+		velocity.x = knockback_strength * hit_direction
+		velocity.y = -knockback_strength * 0.8  # bump upward with slightly less force
 
 		# Recover from stun after short delay
 		await get_tree().create_timer(0.3).timeout

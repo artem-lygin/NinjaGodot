@@ -264,11 +264,20 @@ script = ExtResource("31_neg2b")
 position = Vector2(16, 0)
 shape = SubResource("CircleShape2D_536cc")
 
-[node name="Node2D" parent="." instance=ExtResource("31_k2e45")]
+[node name="Dummy 1" parent="." instance=ExtResource("31_k2e45")]
 position = Vector2(423, 200)
 
-[node name="Node2D2" parent="." instance=ExtResource("31_k2e45")]
+[node name="Dummy 2" parent="." instance=ExtResource("31_k2e45")]
 position = Vector2(481, 356)
+
+[node name="Dummy 3" parent="." instance=ExtResource("31_k2e45")]
+position = Vector2(744, 316)
+
+[node name="Dummy 4" parent="." instance=ExtResource("31_k2e45")]
+position = Vector2(901, 378)
+
+[node name="Dummy 5" parent="." instance=ExtResource("31_k2e45")]
+position = Vector2(1168, 378)
 
 [node name="Platform-A" type="StaticBody2D" parent="."]
 position = Vector2(143, 458)
@@ -459,7 +468,6 @@ position = Vector2(-23.5, -13)
 shape = SubResource("RectangleShape2D_21xkr")
 
 [node name="UI" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="JumpCounterLabel" type="Label" parent="UI"]
 offset_left = 11.0
