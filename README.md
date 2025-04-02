@@ -1,6 +1,6 @@
 # Simple Platformer (Godot)
 
-### `In development'
+`In development`
 
 A simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks dummies, and reaches the goal.
 
