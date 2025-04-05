@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://d2w0lrdd58s4h"]
 
-[ext_resource type="Script" uid="uid://daw8o5wp85ykh" path="res://Scenes/crit_label.gd" id="1_id17h"]
+[ext_resource type="Script" uid="uid://daw8o5wp85ykh" path="res://Scenes/ui/crit_label.gd" id="1_id17h"]
 [ext_resource type="FontFile" uid="uid://c7r7w4pq3bslr" path="res://Fonts/PixelifySans-Bold.ttf" id="1_tjlqj"]
 
 [node name="CritLabel" type="Label"]

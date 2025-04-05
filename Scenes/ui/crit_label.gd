@@ -1,7 +1,7 @@
 extends Label
 
-func show_crit(text := "CRIT!"):
-	self.text = text
+func show_crit(custom_text: String = "CRIT!"):
+	self.text = custom_text
 	scale = Vector2(1.6, 1.6)  # Start slightly larger
 	modulate.a = 1.0
 	position = Vector2(-20, -64)

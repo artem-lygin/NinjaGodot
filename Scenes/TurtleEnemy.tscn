@@ -1,0 +1,115 @@
+[gd_scene load_steps=13 format=3 uid="uid://cilm1j6uv5b1j"]
+
+[ext_resource type="Script" uid="uid://vmei33f6v4vh" path="res://Scenes/turtle_enemy.gd" id="1_4u364"]
+[ext_resource type="Texture2D" uid="uid://ddqy6eixplsq" path="res://sprites/foes/sprite-turtle-dead-01.png" id="3_velxu"]
+[ext_resource type="Texture2D" uid="uid://chyoqdltl4gqv" path="res://sprites/foes/sprite-turtle-run-06.png" id="4_wmlks"]
+[ext_resource type="Texture2D" uid="uid://70udhkpdjev7" path="res://sprites/foes/sprite-turtle-run-07.png" id="5_6a70s"]
+[ext_resource type="Texture2D" uid="uid://bh7li3eubgbos" path="res://sprites/foes/sprite-turtle-run-01.png" id="6_hi8sj"]
+[ext_resource type="Texture2D" uid="uid://cu08v5naswpxm" path="res://sprites/foes/sprite-turtle-run-04.png" id="7_3rjnt"]
+[ext_resource type="Texture2D" uid="uid://brjad5yyidl73" path="res://sprites/foes/sprite-turtle-run-08.png" id="8_wre71"]
+[ext_resource type="Texture2D" uid="uid://cblas2gw4geff" path="res://sprites/foes/sprite-turtle-run-02.png" id="9_6lmc7"]
+[ext_resource type="Texture2D" uid="uid://benirpnrg4j4y" path="res://sprites/foes/sprite-turtle-run-03.png" id="10_stbq4"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_l40ec"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_wmlks")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_6a70s")
+}],
+"loop": true,
+"name": &"aggro",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_velxu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_velxu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_velxu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_velxu")
+}],
+"loop": true,
+"name": &"dead_fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_wmlks")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_6a70s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_hi8sj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_3rjnt")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_hi8sj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_wre71")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_6lmc7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_wre71")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_stbq4")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_l40ec"]
+radius = 16.0
+height = 52.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lkao2"]
+size = Vector2(32, 41)
+
+[node name="Turtle" type="CharacterBody2D"]
+script = ExtResource("1_4u364")
+
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="FoeAnimatedSprite" type="AnimatedSprite2D" parent="Visuals"]
+sprite_frames = SubResource("SpriteFrames_l40ec")
+animation = &"aggro"
+
+[node name="Combat" type="Node2D" parent="."]
+
+[node name="HurtBox" type="Area2D" parent="Combat"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Combat/HurtBox"]
+shape = SubResource("CapsuleShape2D_l40ec")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="RayCast2D_Ground" type="RayCast2D" parent="."]
+target_position = Vector2(0, 26)
+
+[node name="RayCast2D_Wall" type="RayCast2D" parent="."]
+target_position = Vector2(21, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_lkao2")
