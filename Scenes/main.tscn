@@ -32,7 +32,7 @@
 [ext_resource type="Texture2D" uid="uid://csjvx16eguqs7" path="res://sprites/player/sprite-ninja-run-07.png" id="24_hdf80"]
 [ext_resource type="Texture2D" uid="uid://c8fhh1mb2mgoh" path="res://sprites/effects/sprite-dustpuff-tiny.png" id="25_1w6v2"]
 [ext_resource type="Texture2D" uid="uid://v4xwfuj67p22" path="res://sprites/player/sprite-ninja-run-08.png" id="25_jwpg7"]
-[ext_resource type="PackedScene" uid="uid://eifo6q5ajiy8" path="res://Scenes/Dummy.tscn" id="31_k2e45"]
+[ext_resource type="PackedScene" uid="uid://eifo6q5ajiy8" path="res://Scenes/DummyEnemy.tscn" id="31_k2e45"]
 [ext_resource type="Script" uid="uid://c743e0m6ud2xv" path="res://Scenes/sword_hitbox.gd" id="31_neg2b"]
 [ext_resource type="PackedScene" uid="uid://cilm1j6uv5b1j" path="res://Scenes/TurtleEnemy.tscn" id="33_r33sp"]
 

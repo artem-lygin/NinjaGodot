@@ -6,7 +6,7 @@ extends Area2D
 # -----------------------------
 # ⚔️ Weapon Stats
 # -----------------------------
-var base_damage := 10
+var base_damage := randi_range(10, 15)
 var base_crit_chance := 0.25  # 25% chance
 var crit_multiplier := 3
 # Optional future stats:
@@ -38,6 +38,7 @@ func _on_area_entered(area: Area2D) -> void:
 	
 	if enemy and enemy.has_method("take_damage"):
 		var direction = player.facing_direction
+		var base_damage := randi_range(10, 15)  # 🎲 Random damage!
 		var is_crit = randf() < base_crit_chance
 		var final_damage = base_damage * crit_multiplier if is_crit else base_damage
 

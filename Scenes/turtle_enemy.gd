@@ -2,6 +2,7 @@ extends "res://Scenes/enemy_class.gd"
 
 # TurtleEnemy: Specific behavior built on top of base Enemy class
 const TURTLE_SPEED = 20  # Slower than base enemy
+const ENEMY_NAME = "Turtle"
 
 func _ready():
 	super._ready()  # Initialize base class first
@@ -14,18 +15,18 @@ func _ready():
 	
 	# Ensure hurt_box is properly initialized
 	if hurt_box == null:
-		print("[Turtle] HurtBox is null, attempting to find it...")
+		print("[", ENEMY_NAME, "] HurtBox is null, attempting to find it...")
 		hurt_box = $Combat/HurtBox
 		if hurt_box == null:
-			print("[Turtle] Error: HurtBox not found at path $Combat/HurtBox")
-			print("[Turtle] Available nodes:", get_children())
+			print("[", ENEMY_NAME, "] Error: HurtBox not found at path $Combat/HurtBox")
+			print("[", ENEMY_NAME, "] Available nodes:", get_children())
 			# Try alternative path
 			hurt_box = $HurtBox
 			if hurt_box == null:
-				print("[Turtle] Error: HurtBox not found at root level either")
+				print("[", ENEMY_NAME, "] Error: HurtBox not found at root level either")
 				return
-			print("[Turtle] Found HurtBox at root level")
-		print("[Turtle] Successfully initialized HurtBox")
+			print("[", ENEMY_NAME, "] Found HurtBox at root level")
+		print("[", ENEMY_NAME, "] Successfully initialized HurtBox")
 
 func _physics_process(delta):
 	super._physics_process(delta)

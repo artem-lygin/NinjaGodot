@@ -2,7 +2,7 @@
 
 `In development`
 
-A simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks dummies, and reaches the goal.
+A simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks enemies, and reaches the goal.
 
 ## 🚀 Gameplay
 
@@ -10,7 +10,7 @@ A simple 2D platformer made with Godot where the player — a ninja — navigate
 - Press A to jump (with doublejump).
 - Press X to attack with a sword.
 - The player can deal damage, with a chance for critical hits.
-- Dummies (enemies) can receive damage and die.
+- Enemies can receive damage, show health bars, and die with knockback effects.
 - Reaching the goal zone likely finishes the level.
 
 ## 🧠 Key Mechanics
@@ -20,22 +20,43 @@ A simple 2D platformer made with Godot where the player — a ninja — navigate
 - Has an attack system using a sword hitbox (`sword_hitbox.gd`)
 - Can deal damage and trigger critical hits
 
-### Enemy (Dummy)
-- Script: `dummy.gd`
-- Receives damage and plays hit reactions
+### Enemy System
+- Base class: `enemy_class.gd`
+  - Core health and damage systems
+  - Knockback and stun mechanics
+  - Health bar and damage feedback
+  - Death animations and cleanup
+- Specific enemies:
+  - `turtle_enemy.gd`: Turtle enemy
+  - `dummy_enemy.gd`: Basic enemy implementation
 
 ### UI Feedback
-- `DamageLabel.tscn` and `CritLabel.tscn` show floating numbers for damage and critical hits
+- `HealthBar.tscn`: Dynamic health bars for enemies
+  - Color changes based on health percentage
+  - Shake effect on damage
+- `DamageLabel.tscn` and `CritLabel.tscn`: Show floating numbers for damage and critical hits
 
 ### Goal
 - `GoalZone.gd` handles level completion logic
 
-## 🧱 Scenes
-- `Scenes/main.tscn`: Main level scene
-- `Player.tscn`: Contains player node and logic
-- `Dummy.tscn`: Enemy scene
-- `DamageLabel.tscn` and `CritLabel.tscn`: Show feedback on hits
-- `GoalZone.gd`: Marks the end of the level
+## 🧱 Scenes Structure
+```
+Scenes/
+├── ui/                    # UI components
+│   ├── HealthBar.tscn     # Enemy health display
+│   ├── DamageLabel.tscn   # Damage number display
+│   └── CritLabel.tscn     # Critical hit display
+├── TurtleEnemy.tscn       # Turtle enemy scene
+├── DummyEnemy.tscn        # Basic enemy scene
+├── main.tscn              # Main level scene
+└── [Scripts]
+    ├── enemy_class.gd     # Base enemy class
+    ├── turtle_enemy.gd    # Turtle enemy behavior
+    ├── dummy_enemy.gd     # Basic enemy behavior
+    ├── player.gd          # Player controls
+    ├── sword_hitbox.gd    # Attack detection
+    └── GoalZone.gd        # Level completion
+```
 
 ## 📜 Scripts Overview
 
@@ -48,12 +69,34 @@ Handles:
 ### `sword_hitbox.gd`
 Detects enemies in the attack area and applies damage.
 
-### `dummy.gd`
-- Responds to being hit
-- Displays damage or crit labels
-- Plays a death animation when HP reaches 0
+### Enemy System
+#### `enemy_class.gd`
+Base class that handles:
+- Health system with visual feedback
+- Knockback and stun mechanics
+- Death animations and cleanup
+- State management (IDLE, PATROL, AGGRO, STUNNED, DEAD)
 
-### `damage_label.gd` / `crit_label.gd`
+#### `turtle_enemy.gd`
+Extends base enemy with:
+- Shell mechanics
+- Custom health values
+- Unique movement patterns
+
+#### `dummy_enemy.gd`
+Basic enemy implementation:
+- Simple movement patterns
+- Standard health values
+- Basic attack reactions
+
+### UI Components
+#### `health_bar.gd`
+- Dynamic health display
+- Color changes based on health percentage
+- Shake effect on damage
+- Automatic visibility management
+
+#### `damage_label.gd` / `crit_label.gd`
 - Show floating text above enemies
 - Fade out and delete themselves automatically
 

@@ -10,10 +10,15 @@ var max_hp: int = 60
 var current_hp: int = max_hp
 var is_dead: bool = false
 
+# -- Basic Properties --
+var knockable := true # Can be knocked back
+var aggroable := true # Can turn to AGGRO state
+
 # -- Knockback / Damage Reaction --
 var is_stunned: bool = false
 var hit_direction: int = 0 # Direction of the hit tooked
 var recently_hit := false # For avoiding several take_damage from one hit
+var last_damage_received: int = 0 # Death Launch mechanic
 
 var direction = -1  # Start facing left (-1 for left, 1 for right)
 var turn_cooldown = 0.0
@@ -27,6 +32,7 @@ enum State { IDLE, PATROL, AGGRO, STUNNED, DEAD }
 var current_state: State = State.PATROL
 
 # -- UI Components (preloaded scenes) --
+var HealthBarSize = 32
 var HealthBarScene := preload("res://Scenes/ui/HealthBar.tscn")
 var DamageLabelScene := preload("res://Scenes/ui/DamageLabel.tscn")
 var CritLabelScene := preload("res://Scenes/ui/CritLabel.tscn")
@@ -65,7 +71,7 @@ func _ready() -> void:
 	print("[Enemy] Health bar node type:", health_bar.get_class())
 	print("[Enemy] Health bar script:", health_bar.get_script())
 	
-	health_bar.custom_minimum_size.x = 32 # Dynamically sized bar
+	health_bar.custom_minimum_size.x = HealthBarSize # Dynamically sized bar
 	health_bar.max_value = max_hp
 	health_bar.value = max_hp
 	health_bar.visible = false  # Hidden until damaged
@@ -145,6 +151,7 @@ func take_damage(amount: int, attacker_direction: int, is_crit: bool = false) ->
 
 	recently_hit = true
 	hit_direction = attacker_direction
+	last_damage_received = amount
 	current_hp -= amount
 
 	print("[Enemy] Took damage:", amount, "| Crit:", is_crit)
@@ -168,14 +175,18 @@ func take_damage(amount: int, attacker_direction: int, is_crit: bool = false) ->
 		return
 
 	# Always go aggro after taking damage, refresh duration
-	if not is_dead and attacker_direction != 0:
+	if aggroable and not is_dead and attacker_direction != 0:
 		var player = get_tree().get_first_node_in_group("player")
 		if player:
 			trigger_aggro(player)
 			
 	# Only apply stun and knockback if not dying
 	stun()
-	apply_knockback(amount)
+	
+	if knockable:
+		apply_knockback(amount)
+	else:
+		print("[Enemy] Knockback disabled.")
 
 func apply_knockback(amount: int) -> void:
 	var knockback_ratio: float = clamp(float(amount) / float(max_hp), 0.0, 1.0)
@@ -238,16 +249,33 @@ func die() -> void:
 	if foe_sprite:
 		foe_sprite.flip_h = direction < 0
 		foe_sprite.play("dead_fall")
-		foe_sprite.stop()
 	
 	print("[Enemy] Died")
 	
 	# Apply death launch
-	var death_launch_x = 200 * hit_direction  # same direction where the hit was going
-	var death_launch_y = -400  # strong upward launch
+	# Calculate launch force based on damage taken
+	var knockback_ratio: float = clamp(float(last_damage_received) / float(max_hp), 0.0, 1.0)
+	# var scaled_ratio := pow(knockback_ratio, 3.0)  # Exponential scale
+	var scaled_ratio := knockback_ratio  # Linear scale
+	# Knockback Scaling Curves Reference:
+	# Curve        | Formula                      | Effect
+	# ------------ | ---------------------------- | -------------------------------
+	# Linear       | x                            | Consistent scaling
+	# Exponential  | pow(x, 2.0)                  | Punchier high-end, weak low-end
+	# Steeper      | pow(x, 3.0)                  | Only massive hits cause knockback
+	# SmoothStep   | x * x * (3 - 2 * x)          | Smooth S-curve easing
+	var launch_force: float = lerp(150.0, 400.0, scaled_ratio)
+
+	var death_launch_x = round(launch_force) * hit_direction
+	var death_launch_y = -round(launch_force) * 0.8
 	velocity = Vector2(death_launch_x, death_launch_y)
+
 	print("[Enemy] Death launch applied - X:", death_launch_x, " Y:", death_launch_y)
-	print("[Enemy] Current velocity:", velocity)
+	#var death_launch_x = 200 * hit_direction  # same direction where the hit was going
+	#var death_launch_y = -400  # strong upward launch
+	#velocity = Vector2(death_launch_x, death_launch_y)
+	#print("[Enemy] Death launch applied - X:", death_launch_x, " Y:", death_launch_y)
+	#print("[Enemy] Current velocity:", velocity)
 	
 	# Set death state after applying launch
 	set_state(State.DEAD)
