@@ -1,5 +1,17 @@
 extends Label
 
+# =============================
+# 💢 damage_label.gd
+# =============================
+
+# ✅ Displays numeric damage value above enemy
+# ✅ Color-coded: gold for crits, white for normal
+# ✅ Customizable font size per damage type
+# ✅ Pops upward with tweened movement
+# ✅ Fades out and self-removes
+# ✅ Can be shown multiple times in a row
+# ✅ Z index: always on top
+
 func show_damage(value: int, is_crit: bool = false) -> void:
 	text = "-" + str(value)
 	modulate.a = 1.0

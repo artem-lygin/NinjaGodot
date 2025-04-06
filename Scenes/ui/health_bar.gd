@@ -1,5 +1,20 @@
 extends ProgressBar
 
+# =============================
+# ❤️ health_bar.gd
+# =============================
+
+# ✅ Pixel-style health bar
+# ✅ Dynamically sized and positioned
+# ✅ Color changes:
+#    - Green (healthy)
+#    - Yellow (wounded)
+#    - Red (critical)
+# ✅ Shake effect on damage
+# ✅ Updates via method calls from enemy_class.gd
+# ✅ Pivot centered — easily anchor above enemies
+# ✅ Hidden when full, auto-visible on damage
+
 var shake_amount := 4
 var shake_duration := 0.2
 

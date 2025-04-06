@@ -1,5 +1,23 @@
 extends Area2D
-#
+
+# =============================
+# ⚔️ sword_hitbox.gd
+# =============================
+
+# ✅ Handles player's sword collisions
+# ✅ Defines weapon stats:
+#    - base_damage (random range supported)
+#    - base_crit_chance
+#    - crit_multiplier
+# ✅ Calculates and applies final damage
+# ✅ Transfers:
+#    - Damage amount
+#    - Hit direction
+#    - Crit status
+# ✅ Calls enemy's take_damage() method safely
+# ✅ Isolated logic = easily extendable for new weapons
+# ✅ Attack duration controlled via player script
+
 ## Optional: track parent player if needed
 @onready var player = get_parent()
 

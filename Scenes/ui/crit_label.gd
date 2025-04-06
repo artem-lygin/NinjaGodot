@@ -1,5 +1,17 @@
 extends Label
 
+# =============================
+# 💥 crit_label.gd
+# =============================
+
+# ✅ Displays "CRIT!" label above enemy
+# ✅ Customizable text and color (gold by default)
+# ✅ Pops upward with tweened movement
+# ✅ Shakes horizontally (impact feel)
+# ✅ Fades out and auto-removes (queue_free)
+# ✅ Delay configurable when triggered
+# ✅ Highest Z index to appear over all visuals
+
 func show_crit(custom_text: String = "CRIT!"):
 	self.text = custom_text
 	scale = Vector2(1.6, 1.6)  # Start slightly larger

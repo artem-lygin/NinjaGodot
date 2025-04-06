@@ -271,6 +271,12 @@ position = Vector2(423, 200)
 [node name="Turtle" parent="." instance=ExtResource("33_r33sp")]
 position = Vector2(417, 389)
 
+[node name="Turtle2" parent="." instance=ExtResource("33_r33sp")]
+position = Vector2(269, 320)
+
+[node name="Turtle3" parent="." instance=ExtResource("33_r33sp")]
+position = Vector2(717, 320)
+
 [node name="Platform-A" type="StaticBody2D" parent="."]
 position = Vector2(143, 458)
 

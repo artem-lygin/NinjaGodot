@@ -2,13 +2,15 @@
 
 `In development`
 
-A simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks enemies, and reaches the goal.
+An experiment: simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks enemies, and reaches the goal. Build with ChatGPT both code and art. Follow me for progress 🇬🇧 ENG https://x.com/artemlygin | 🇺🇦 UA https://www.threads.net/@artemlygin
 
 ## 🚀 Gameplay
 
-- Use arrow keys to move.
+Controller support only (For now)
+- Gimbal Left and Righr
 - Press A to jump (with doublejump).
 - Press X to attack with a sword.
+- L1 resets the scene.
 - The player can deal damage, with a chance for critical hits.
 - Enemies can receive damage, show health bars, and die with knockback effects.
 - Reaching the goal zone likely finishes the level.
@@ -79,15 +81,12 @@ Base class that handles:
 
 #### `turtle_enemy.gd`
 Extends base enemy with:
-- Shell mechanics
 - Custom health values
-- Unique movement patterns
 
 #### `dummy_enemy.gd`
 Basic enemy implementation:
-- Simple movement patterns
-- Standard health values
-- Basic attack reactions
+- Extended health values
+- Only IDLE or DEAD
 
 ### UI Components
 #### `health_bar.gd`

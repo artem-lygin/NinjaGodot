@@ -1,6 +1,24 @@
 extends CharacterBody2D
 
-# Enemy Base Class: Core Systems (health, damage, states)
+# =============================
+# 🧠 enemy_class.gd (BASE ENEMY)
+# =============================
+
+# ✅ Shared health and damage system
+# ✅ Health bar with color + shake effects
+# ✅ Floating damage & crit labels
+# ✅ Knockback based on damage taken
+# ✅ Death launch based on final hit force
+# ✅ State machine: IDLE, PATROL, AGGRO, STUNNED, DEAD
+# ✅ AGGRO with delay + timer after taking damage
+# ✅ STUN with cooldown
+# ✅ Animation control via state
+# ✅ Fall cleanup (queue_free if falls off screen)
+# ✅ Visual feedback (flash red on hit)
+# ✅ Configurable base speed and gravity
+# ✅ Toggles:
+#    - knockable
+#    - aggroable
 
 const SPEED = 40  # How fast the dummy moves
 const GRAVITY = 800.0  # Match this to your player's gravity

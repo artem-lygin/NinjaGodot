@@ -1,7 +1,16 @@
 extends "res://Scenes/enemy_class.gd"
 
-# Dummy enemy — inherits all logic from enemy_class.gd
-# No patrol, idle or movement behavior, just a stationary target
+# =============================
+# 🪵 dummy.gd
+# =============================
+
+# ✅ Inherits from enemy_class.gd
+# ✅ No movement or AI — IDLE only
+# ✅ No aggro (aggroable = false)
+# ✅ No knockback (knockable = false)
+# ✅ Shows health bar + damage visuals
+# ✅ Dies with proper death animation and launch
+
 const ENEMY_NAME = "Dummy"
 const IS_KNOCKABLE = false # Can't be knoked back by attack
 const IS_AGGROABLE = false # Doesn't turn to AGGRO after get a hit

@@ -1,15 +1,26 @@
 extends "res://Scenes/enemy_class.gd"
 
-# TurtleEnemy: Specific behavior built on top of base Enemy class
-const TURTLE_SPEED = 20  # Slower than base enemy
+# =============================
+# 🐢 turtle_enemy.gd
+# =============================
+
+# ✅ Inherits all features from enemy_class.gd
+# ✅ Patrol behavior (walks left/right on platform)
+# ✅ Flip sprite based on direction
+# ✅ Uses base animations: walk, idle, aggro, dead_fall
+# ✅ AGGRO if player detected or hit
+# ✅ STUN and knockback active
+# ✅ Fully customizable health, animations, and speed
+
 const ENEMY_NAME = "Turtle"
+const TURTLE_SPEED = 20  # Slower than base enemy
+const TURLE_MAX_HP = 60
 
 func _ready():
 	super._ready()  # Initialize base class first
-	
-	# Custom setup for Turtle
-	max_hp = 30
+	max_hp = TURLE_MAX_HP
 	current_hp = max_hp
+	# Custom setup for Turtle
 	health_bar.max_value = max_hp
 	health_bar.value = current_hp
 	
