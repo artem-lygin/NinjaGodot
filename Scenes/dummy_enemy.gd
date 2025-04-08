@@ -16,10 +16,12 @@ const IS_KNOCKABLE = false # Can't be knoked back by attack
 const IS_AGGROABLE = false # Doesn't turn to AGGRO after get a hit
 const IS_STUNNABLE = true # Not used yet
 const HEALTH_BAR_SIZE = 48
+const GORE_SPLIT = false # Cannot be splitted
 
 var dummy_max_hp: int = 220  # Custom HP for the dummy
 
 func _ready() -> void:
+	can_split_on_death = GORE_SPLIT
 	knockable = IS_KNOCKABLE
 	aggroable = IS_AGGROABLE
 	HealthBarSize = HEALTH_BAR_SIZE

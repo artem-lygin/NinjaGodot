@@ -25,6 +25,7 @@ const GRAVITY = 800.0  # Match this to your player's gravity
 
 # -- Health System --
 var max_hp: int = 60
+var HealthBarSize = 32
 var current_hp: int = max_hp
 var is_dead: bool = false
 
@@ -38,6 +39,11 @@ var hit_direction: int = 0 # Direction of the hit tooked
 var recently_hit := false # For avoiding several take_damage from one hit
 var last_damage_received: int = 0 # Death Launch mechanic
 
+# -- Gore Support --
+var can_split_on_death := true
+var gib_texture_left: Texture = null
+var gib_texture_right: Texture = null
+
 var direction = -1  # Start facing left (-1 for left, 1 for right)
 var turn_cooldown = 0.0
 var aggro_timer := 0.0
@@ -49,11 +55,11 @@ var previous_state: State = State.IDLE # Tracking last state for proper ordering
 enum State { IDLE, PATROL, AGGRO, STUNNED, DEAD }
 var current_state: State = State.PATROL
 
-# -- UI Components (preloaded scenes) --
-var HealthBarSize = 32
+# -- Preloaded scenes --
 var HealthBarScene := preload("res://Scenes/ui/HealthBar.tscn")
 var DamageLabelScene := preload("res://Scenes/ui/DamageLabel.tscn")
 var CritLabelScene := preload("res://Scenes/ui/CritLabel.tscn")
+var GibScene := preload("res://Scenes/Gib.tscn")  # 🧠 Gib (split body) prefab
 
 @onready var health_bar: ProgressBar = null  # Will be assigned on spawn
 @onready var ray_ground = $RayCast2D_Ground
@@ -86,8 +92,8 @@ func _ready() -> void:
 
 	# Get the ProgressBar node from the instantiated scene
 	health_bar = bar.get_node("ProgressBar")
-	print("[Enemy] Health bar node type:", health_bar.get_class())
-	print("[Enemy] Health bar script:", health_bar.get_script())
+	#print("[Enemy] Health bar node type:", health_bar.get_class())
+	#print("[Enemy] Health bar script:", health_bar.get_script())
 	
 	health_bar.custom_minimum_size.x = HealthBarSize # Dynamically sized bar
 	health_bar.max_value = max_hp
@@ -163,7 +169,7 @@ func _physics_process(delta: float) -> void:
 	
 	move_and_slide()
 
-func take_damage(amount: int, attacker_direction: int, is_crit: bool = false) -> void:
+func take_damage(amount: int, attacker_direction: int, is_crit: bool = false, is_mega: bool = false) -> void:
 	if is_dead or recently_hit:
 		return
 
@@ -172,13 +178,13 @@ func take_damage(amount: int, attacker_direction: int, is_crit: bool = false) ->
 	last_damage_received = amount
 	current_hp -= amount
 
-	print("[Enemy] Took damage:", amount, "| Crit:", is_crit)
+	print("[Enemy] Took damage:", amount, "| Crit:", is_crit, "| Mega:", is_mega)
 
 	# Update health bar visuals
 	health_bar.value = current_hp
 	health_bar.update_color()  # Use the health_bar's built-in method
 	health_bar.visible = current_hp < max_hp
-	show_damage_label(amount, is_crit)
+	show_damage_label(amount, is_crit, is_mega)
 	health_bar.shake()  # Use the health_bar's built-in shake method
 
 	# Flash red briefly on hit
@@ -187,10 +193,12 @@ func take_damage(amount: int, attacker_direction: int, is_crit: bool = false) ->
 	modulate = Color(1, 1, 1)
 	recently_hit = false
 
-	# Check for death
-	if current_hp <= 0:
-		die()
-		return
+	# Check for ready to die
+	if current_hp <= 0 and not is_dead:
+		if is_mega:
+			die_with_gore()
+		else:
+			die()
 
 	# Always go aggro after taking damage, refresh duration
 	if aggroable and not is_dead and attacker_direction != 0:
@@ -303,13 +311,105 @@ func die() -> void:
 	await get_tree().create_timer(3.0).timeout
 	queue_free()
 
-func show_damage_label(amount: int, is_crit: bool = false) -> void:
+func die_with_gore():
+	var last_enemy_direction: int = direction
+	direction = 0 # stop AI movement
+	print("\n💀 GORE DEATH TRIGGERED | Last Direction", last_enemy_direction)
+	
+	if not gib_texture_left or not gib_texture_right:
+		print("⚠️ No gib textures assigned!")
+		die()
+		return
+
+	# 👁️ Cinematic Zoom & Super Slow Motion
+	var player = get_tree().get_first_node_in_group("player")
+	var player_camera: Camera2D = null
+
+	if player:
+		player_camera = player.get_node_or_null("PlayerCamera")
+
+		# Step 1: Slow down time dramatically and zoom in
+		Engine.time_scale = 0.1
+		print("🐌 Super slo-mo time started")
+
+		if player_camera:
+			# 📴 Disable smoothing before zooming
+			player_camera.position_smoothing_speed = 25.0
+			player_camera.set_offset(Vector2.ZERO)
+			player_camera.position = Vector2.ZERO  # Ensure camera centers on player
+			print("🔍 Zooming in on player camera")
+			var zoom_tween = player_camera.create_tween()
+			zoom_tween.tween_property(player_camera, "zoom", Vector2(2, 2), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	# Step 2: Hide sprite
+	if foe_sprite:
+		foe_sprite.visible = false
+		print("👻 Hiding foe_sprite")
+
+	# Step 3: Spawn and launch gibs
+	var gib_left = GibScene.instantiate()
+	var gib_right = GibScene.instantiate()
+	print("🔧 Instantiated GibScene twice")
+
+	gib_left.global_position = global_position
+	gib_right.global_position = global_position
+	print("📍 Positioned gibs at:", global_position)
+
+	gib_left.get_node("Sprite2D").texture = gib_texture_left
+	gib_right.get_node("Sprite2D").texture = gib_texture_right
+	print("🖼️ Gib textures assigned")
+
+	get_tree().current_scene.add_child(gib_left)
+	get_tree().current_scene.add_child(gib_right)
+	print("🧩 Gibs added to scene")
+
+	if last_enemy_direction < 0:
+		gib_left.get_node("Sprite2D").flip_h = true
+		gib_right.get_node("Sprite2D").flip_h = true
+		gib_left.linear_velocity = Vector2(300, -250)
+		gib_right.linear_velocity = Vector2(-300, -250)
+	else:
+		gib_left.linear_velocity = Vector2(-300, -250)
+		gib_right.linear_velocity = Vector2(300, -250)
+
+	print("🚀 Applied linear_velocity to gibs")
+
+	# Step 4: Wait → then switch to slo-mo + zoom out
+	await get_tree().create_timer(0.25).timeout
+	Engine.time_scale = 0.5
+	print("⏳ Partial time restore")
+
+	if player_camera:
+		var reset_zoom = player_camera.create_tween()
+		reset_zoom.tween_property(player_camera, "zoom", Vector2(1, 1), 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+		# ✅ Restore smoothing after zoom-out finishes
+		await reset_zoom.finished
+		player_camera.position_smoothing_speed = 5.0
+		
+		print("🔁 Camera zoom reset")
+
+	# Step 5: Wait → then restore normal time
+	await get_tree().create_timer(0.25).timeout
+	Engine.time_scale = 1.0
+	print("✅ Time fully restored")
+
+	# Step 6: Remove node
+	print("🧹 Removing enemy node")
+	queue_free()
+
+func show_damage_label(amount: int, is_crit: bool = false, is_mega: bool = false) -> void:
 	var label = DamageLabelScene.instantiate()
 	add_child(label)
-	label.show_damage(amount)
-	
-	if is_crit:
+	label.show_damage(amount, is_crit)
+
+	# Only show CRIT label if one of the crit flags is true
+	if is_crit or is_mega:
+		print("💥 Displaying crit label... is_crit:", is_crit, "| is_mega:", is_mega)
+
 		await get_tree().create_timer(0.15).timeout
 		var crit_label = CritLabelScene.instantiate()
 		add_child(crit_label)
-		crit_label.show_crit("CRIT!")
+
+		var label_text = "MEGACRIT!!!" if is_mega else "CRIT!"
+		print("🪧 Crit Label Text:", label_text)
+		crit_label.show_crit(label_text)

@@ -113,3 +113,13 @@ target_position = Vector2(21, 0)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_lkao2")
+
+[node name="CritLabelAnchor" type="Node2D" parent="."]
+visible = false
+
+[node name="Label" type="Label" parent="CritLabelAnchor"]
+offset_left = -19.0
+offset_right = 21.0
+offset_bottom = 23.0
+text = "+"
+horizontal_alignment = 1

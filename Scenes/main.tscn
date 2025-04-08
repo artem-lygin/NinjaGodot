@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://cttr3u0ace8fx"]
+[gd_scene load_steps=49 format=3 uid="uid://cttr3u0ace8fx"]
 
 [ext_resource type="Script" uid="uid://c72vulqtocj4f" path="res://Scenes/player.gd" id="1_bo1nx"]
 [ext_resource type="Texture2D" uid="uid://1o12wvnfube" path="res://sprites/environment/bg-sky-16x9.png" id="1_kry3j"]
@@ -16,11 +16,17 @@
 [ext_resource type="Texture2D" uid="uid://y82xt5j45ahg" path="res://sprites/player/sprite-ninja-attack-04.png" id="9_hdf80"]
 [ext_resource type="Texture2D" uid="uid://doymhqwuty5v2" path="res://sprites/player/sprite-ninja-idle-04.png" id="10_fevyy"]
 [ext_resource type="Texture2D" uid="uid://c5txkdf7nr0qj" path="res://sprites/player/sprite-ninja-attack-05.png" id="10_jwpg7"]
+[ext_resource type="Texture2D" uid="uid://bbgtaljdturhn" path="res://sprites/player/sprite-ninja-dash-01.png" id="11_8cuat"]
 [ext_resource type="Texture2D" uid="uid://f6h78o5qgmcx" path="res://sprites/player/sprite-ninja-idle-05.png" id="11_hibaj"]
+[ext_resource type="Texture2D" uid="uid://d1qdpwwx746iy" path="res://sprites/player/sprite-ninja-dash-02.png" id="12_o1aky"]
 [ext_resource type="Texture2D" uid="uid://di3jfvhqrn6mp" path="res://sprites/player/sprite-ninja-idle-06.png" id="12_pdsj5"]
 [ext_resource type="Texture2D" uid="uid://b3p61462a0l0d" path="res://sprites/player/sprite-ninja-idle-07.png" id="13_ee4r6"]
+[ext_resource type="Texture2D" uid="uid://dhgu0hryks0bq" path="res://sprites/player/sprite-ninja-dash-03.png" id="13_kwxat"]
+[ext_resource type="Texture2D" uid="uid://s5xx2rd0mcmr" path="res://sprites/player/sprite-ninja-dash-04.png" id="14_aa8k8"]
 [ext_resource type="Texture2D" uid="uid://csnibefmubnd8" path="res://sprites/player/sprite-ninja-idle-08.png" id="14_gt3je"]
 [ext_resource type="Texture2D" uid="uid://0ob2jsyax1gn" path="res://sprites/player/sprite-ninja-jump-01.png" id="15_1w6v2"]
+[ext_resource type="Texture2D" uid="uid://bmd8tdcwg3kbf" path="res://sprites/player/sprite-ninja-dash-05.png" id="15_kqrg6"]
+[ext_resource type="Texture2D" uid="uid://dmixmavkm3v1p" path="res://sprites/player/sprite-ninja-dash-06.png" id="16_nwwfm"]
 [ext_resource type="Texture2D" uid="uid://bddddcvqbxakw" path="res://sprites/player/sprite-ninja-jump-02.png" id="16_ueoa1"]
 [ext_resource type="Texture2D" uid="uid://ylmpsbe47te1" path="res://sprites/player/sprite-ninja-jump-03.png" id="17_6vcvc"]
 [ext_resource type="Texture2D" uid="uid://dqpeoiavtu6pi" path="res://sprites/player/sprite-ninja-run-01.png" id="18_7k868"]
@@ -60,6 +66,29 @@ animations = [{
 "loop": true,
 "name": &"attack",
 "speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_8cuat")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_o1aky")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_kwxat")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_aa8k8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_kqrg6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_nwwfm")
+}],
+"loop": true,
+"name": &"dash",
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -227,9 +256,9 @@ position_smoothing_enabled = true
 
 [node name="PlayerAnimatedSprite" type="AnimatedSprite2D" parent="Player"]
 sprite_frames = SubResource("SpriteFrames_3pmx8")
-animation = &"attack"
-frame = 3
-frame_progress = 0.902326
+animation = &"dash"
+frame = 2
+frame_progress = 0.264745
 
 [node name="SpeedLabel" type="Label" parent="Player"]
 visible = false
@@ -341,7 +370,7 @@ scale = Vector2(0.8, 0.8)
 texture = ExtResource("3_8gbba")
 
 [node name="Platform-D" type="StaticBody2D" parent="."]
-position = Vector2(437, 301)
+position = Vector2(437, 276)
 
 [node name="CollisionShape-B" type="CollisionShape2D" parent="Platform-D"]
 position = Vector2(-12.25, 0)

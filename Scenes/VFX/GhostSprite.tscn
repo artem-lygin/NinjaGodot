@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://cxscijrkswpil"]
+
+[ext_resource type="Script" uid="uid://dutoxxcjis0w7" path="res://Scenes/VFX/ghost_sprite.gd" id="1_y3p3u"]
+[ext_resource type="Texture2D" uid="uid://bbgtaljdturhn" path="res://sprites/player/sprite-ninja-dash-01.png" id="2_t4x17"]
+
+[node name="GhostSprite" type="Node2D"]
+script = ExtResource("1_y3p3u")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_t4x17")

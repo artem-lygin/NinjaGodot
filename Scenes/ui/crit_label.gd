@@ -1,10 +1,10 @@
-extends Label
+extends Node2D
 
 # =============================
 # 💥 crit_label.gd
 # =============================
 
-# ✅ Displays "CRIT!" label above enemy
+# ✅ Displays "CRIT!" or "MEGACRIT!" label above enemy
 # ✅ Customizable text and color (gold by default)
 # ✅ Pops upward with tweened movement
 # ✅ Shakes horizontally (impact feel)
@@ -12,24 +12,33 @@ extends Label
 # ✅ Delay configurable when triggered
 # ✅ Highest Z index to appear over all visuals
 
-func show_crit(custom_text: String = "CRIT!"):
-	self.text = custom_text
-	scale = Vector2(1.6, 1.6)  # Start slightly larger
-	modulate.a = 1.0
-	position = Vector2(-20, -64)
+@onready var label: Label = $CritLabel
 
-	# Big red or gold color
-	add_theme_color_override("font_color", Color("FFD700"))  # gold
-	add_theme_font_size_override("font_size", 24)
+func show_crit(custom_text: String = "NO VALUE!"):
+	label.text = custom_text
+	label.scale = Vector2(1.2, 1.2)  # Start slightly larger
+	label.modulate.a = 1.0
+	# label.position = Vector2(0, 0)
+	label.position = Vector2(-label.size.x / 2, -80)
 
-	# Animate float up + fade out
+	# 🎨 Color and size based on type of crit
+	if custom_text == "MEGACRIT!!!":
+		label.add_theme_color_override("font_color", Color("ff4444"))  # Bold red for mega crit
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))   # White outline
+		label.add_theme_constant_override("outline_size", 8)           # Stroke thickness
+		label.add_theme_font_size_override("font_size", 32)
+	else:
+		label.add_theme_color_override("font_color", Color("FFD700"))  # Gold for normal crit
+		label.add_theme_font_size_override("font_size", 24)
+
+	# 🌀 Animate float up + fade out + scale pop
 	var tween = create_tween()
 	tween.set_parallel()
-	tween.tween_property(self, "position", Vector2(-20, -148), 1.8).set_trans(Tween.TRANS_SINE).set_delay(0.1) # Float up with delay
-	tween.tween_property(self, "modulate:a", 0.0, 1.8).set_trans(Tween.TRANS_SINE) # Fade out
-	tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.9).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT) # POP scale-in
-	
-	# Add shake effect (left-right jitter)
+	tween.tween_property(self, "position", Vector2(0, -160), 1.8).set_trans(Tween.TRANS_SINE).set_delay(0.1)
+	tween.tween_property(self, "modulate:a", 0.0, 1.8).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(label, "scale", Vector2(1.6, 1.6), 0.9).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+	# 💢 Shake effect
 	var shake_tween = create_tween()
 	var shake_amount = 6
 	var shake_duration = 0.06

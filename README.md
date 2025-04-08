@@ -2,14 +2,16 @@
 
 `In development`
 
-An experiment: simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks enemies, and reaches the goal. Build with ChatGPT both code and art. Follow me for progress 🇬🇧 ENG https://x.com/artemlygin | 🇺🇦 UA https://www.threads.net/@artemlygin
+An experiment: simple 2D platformer made with Godot where the player — a ninja — navigates through platforms, attacks enemies, and reaches the goal. Build with ChatGPT both code and art.
+Follow me for progress 🇬🇧 ENG https://x.com/artemlygin | 🇺🇦 UA https://www.threads.net/@artemlygin
 
 ## 🚀 Gameplay
 
 Controller support only (For now)
 - Gimbal Left and Righr
-- Press A to jump (with doublejump).
-- Press X to attack with a sword.
+- Press A to jump (Twice for doublejump)
+- Press X to attack with a sword
+- Press R1 for dash
 - L1 resets the scene.
 - The player can deal damage, with a chance for critical hits.
 - Enemies can receive damage, show health bars, and die with knockback effects.
@@ -20,7 +22,7 @@ Controller support only (For now)
 ### Player
 - Controlled via `player.gd`
 - Has an attack system using a sword hitbox (`sword_hitbox.gd`)
-- Can deal damage and trigger critical hits
+- Can deal damage and trigger critical hits and megacrits
 
 ### Enemy System
 - Base class: `enemy_class.gd`
@@ -100,4 +102,4 @@ Basic enemy implementation:
 - Fade out and delete themselves automatically
 
 ### `GoalZone.gd`
-- When the player enters the area, the game reacts (likely ends or triggers victory)
+- When the player enters the area, the game reacts (log output)

@@ -54,13 +54,28 @@ func _on_area_entered(area: Area2D) -> void:
 		enemy = enemy.get_parent()  # Get the actual enemy node
 		print("🔍 Enemy node:", enemy.name)
 	
+	# Attack logic with CRIT and MEGACRIT support
 	if enemy and enemy.has_method("take_damage"):
 		var direction = player.facing_direction
-		var base_damage := randi_range(10, 15)  # 🎲 Random damage!
+		
+		# 🎲 Random base damage
+		var base_damage := randi_range(10, 15)
+		
+		# 💥 Critical hit chance check
 		var is_crit = randf() < base_crit_chance
-		var final_damage = base_damage * crit_multiplier if is_crit else base_damage
 
-		print("💥 Hitting enemy:", enemy.name, "| Damage:", final_damage, "| Crit:", is_crit)
-		enemy.take_damage(final_damage, direction, is_crit)
+		# 💀 Megacrit (post-dash) check
+		var is_mega = false
+		if player.has_method("is_in_megacrit_window") and player.is_in_megacrit_window():
+			is_mega = true
+			print("💀 MEGACRIT triggered!")
+
+		# 🧮 Calculate final damage
+		var final_damage = base_damage * crit_multiplier if is_crit else base_damage
+		if is_mega:
+			final_damage *= 10  # Apply x10 multiplier for megacrit
+
+		print("💥 Hitting enemy:", enemy.name, "| Damage:", final_damage, "| Crit:", is_crit, "| Mega:", is_mega)
+		enemy.take_damage(final_damage, direction, is_crit, is_mega)
 	else:
 		print("⚠️ Hit object has no take_damage() method. Object name:", enemy.name if enemy else "null")

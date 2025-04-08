@@ -3,13 +3,25 @@
 [ext_resource type="Script" uid="uid://daw8o5wp85ykh" path="res://Scenes/ui/crit_label.gd" id="1_id17h"]
 [ext_resource type="FontFile" uid="uid://c7r7w4pq3bslr" path="res://Fonts/PixelifySans-Bold.ttf" id="1_tjlqj"]
 
-[node name="CritLabel" type="Label"]
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_id17h")
+
+[node name="CritLabel" type="Label" parent="."]
 z_index = 4096
-offset_right = 40.0
-offset_bottom = 23.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_right = 180.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(90, 30)
+size_flags_horizontal = 4
 theme_override_colors/font_outline_color = Color(0, 0, 0, 0.784314)
 theme_override_constants/outline_size = 4
 theme_override_fonts/font = ExtResource("1_tjlqj")
 theme_override_font_sizes/font_size = 24
+text = "DEFAULT LABEL"
 horizontal_alignment = 1
-script = ExtResource("1_id17h")
