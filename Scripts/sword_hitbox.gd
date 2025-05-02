@@ -33,8 +33,8 @@ var crit_multiplier := 3
 # var knockback_strength := 100
 
 func _on_area_entered(area: Area2D) -> void:
-	print("🔍 Area entered:", area.name)
-	print("🔍 Area parent:", area.get_parent().name if area.get_parent() else "No parent")
+	# print("🔍 Area entered:", area.name)
+	# print("🔍 Area parent:", area.get_parent().name if area.get_parent() else "No parent")
 	
 	# Check if the area is a HurtBox (either direct or under Combat node)
 	if not (area.name == "HurtBox" or (area.get_parent() and area.get_parent().name == "HurtBox")):

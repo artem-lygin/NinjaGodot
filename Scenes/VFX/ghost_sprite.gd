@@ -10,7 +10,7 @@ func setup(texture: Texture2D, position: Vector2, flip_h: bool):
 		push_error("❌ Sprite is null in GhostSprite!")
 		return
 
-	print("🧊 Ghost texture received:", texture)
+	# print("🌀 Ghost texture received:", texture)
 
 	# Apply texture and flip to the child sprite
 	sprite.texture = texture
@@ -18,8 +18,8 @@ func setup(texture: Texture2D, position: Vector2, flip_h: bool):
 
 	# ✅ Correct: set the root ghost node position
 	self.global_position = position
-	print("📍 Setting ghost global_position to:", position)
-	print("📍 Ghost global_position after setup:", self.global_position)
+	# print("📍 Setting ghost global_position to:", position)
+	# print("📍 Ghost global_position after setup:", self.global_position)
 
 	# Set transparency
 	modulate = Color(1, 1, 1, 0.8)

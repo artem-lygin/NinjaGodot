@@ -7,6 +7,7 @@ const ACCELERATION = 1000     # Speed gain when moving
 const FRICTION = 800          # Speed loss when not moving
 const MOMENTUM_THRESHOLD = 10.0  # Player can "turn" at low speeds
 const BASE_DAMAGE = 10
+const THROW_SPEED = 800.0
 
 # Ghost VFX
 var GhostScene := preload("res://Scenes/VFX/GhostSprite.tscn")
@@ -35,40 +36,28 @@ var time_since_dash := 999.0  # Start outside window
 @onready var speed_label = $SpeedLabel # Speed Label for test
 @onready var dust = $JumpDust # Jump Dust Effect
 @onready var jump_label = get_node("../UI/JumpCounterLabel")
+@onready var shuriken_label = get_node("../UI/ShurikenCounterLabel")
+@onready var throwable_label = get_node("../UI/ThrowableLabel")
+@onready var ShurikenScene = preload("res://Scenes/Shuriken.tscn")
+@onready var DecoyScene := preload("res://Scenes/Weapons/ThrowableDecoy.tscn")
+@onready var drawer := $TrajectoryDrawer
 @onready var sword_hitbox = $SwordHitbox
 @onready var sword_shape = $SwordHitbox/CollisionShape2D
+@onready var aiming_target := $AimingTarget
+var is_aiming := false
+@export var aim_radius: float = 80.0  # How far from the player the aim point can go
 
+# Initialization
 func _ready():
 	# Make sure the sword hitbox is off when game starts
 	sword_hitbox.monitoring = false
 	sword_shape.disabled = true
 	# Capture the player's initial position at the start of the game
 	start_position = global_position
-	
-func start_attack():
-	if is_attacking: # Check if player already in attack
-		return
 
-	is_attacking = true
-	
-	# Activate hitbox only during attack
-	sword_shape.disabled = false
-	sword_hitbox.monitoring = true # Enable collisions for this attack
-
-	# Play attack animation
-	sprite.play("attack")
-	
-	await get_tree().create_timer(0.1).timeout  # ← match animation length
-	# Deactivate hitbox
-	sword_hitbox.monitoring = false # Disable immediately after hit window
-	sword_shape.disabled = true
-	await get_tree().create_timer(0.2).timeout  # Let animation finish
-	is_attacking = false
-
-
+# Movement, gravity, physics-based interactions
 func _physics_process(delta):
 	# 🏃 Use self.velocity directly to avoid clashing with dash logic
-	# (No need for local `velocity` copy anymore)
 
 	# ☑️ Refill jumps when grounded
 	if is_on_floor():
@@ -94,8 +83,12 @@ func _physics_process(delta):
 			sprite.flip_h = facing_direction < 0
 
 			# 🔁 Flip sword hitbox to match direction
-			var sword_shape = sword_hitbox.get_node("CollisionShape2D")
-			sword_shape.position.x = abs(sword_shape.position.x) * facing_direction
+			var sword_shape: CollisionShape2D = sword_hitbox.get_node("CollisionShape2D")
+			var player_half_width: float = $CollisionShape2D.shape.radius
+			var hitbox_half_width: float = (sword_shape.shape as CircleShape2D).radius
+			var forward_offset: float = 30 # Tweaking the offset. 0 is fully extended arms: Collision Shapes are not interlaping
+			var offset_x: float = player_half_width + hitbox_half_width - forward_offset
+			sword_shape.position.x = offset_x * facing_direction
 
 			# 🧮 Acceleration logic
 			if abs(self.velocity.x) < MOMENTUM_THRESHOLD:
@@ -108,7 +101,7 @@ func _physics_process(delta):
 			# 🛑 No input = apply friction
 			self.velocity.x = move_toward(self.velocity.x, 0, FRICTION * delta)
 
-	# 🪂 Jumping
+	# Jumping
 	if Input.is_action_just_pressed("jump") and jumps_remaining > 0:
 		self.velocity.y = JUMP_FORCE
 
@@ -118,25 +111,62 @@ func _physics_process(delta):
 
 		jumps_remaining -= 1  # Use up a jump
 
-	# 🗡️ Attack input
+	# Attack input
 	if Input.is_action_just_pressed("attack") and not is_attacking:
 		start_attack()
+		
+	# Shuriken throw input
+	if Input.is_action_just_pressed("throw_secondary"):
+		if ShurikenManager.can_throw():
+			ShurikenManager.throw(global_position, Vector2(facing_direction, 0))
 
-	# 🌀 Dash input
+	# Handle “throw_item” Input
+	if Input.is_action_just_pressed("throw_item") and is_aiming:
+		var direction: Vector2 = aiming_target.global_position - global_position
+		var throw_velocity: Vector2 = direction.normalized() * THROW_SPEED
+		ThrowableManager.throw(global_position, throw_velocity)
+	
+	# Handle Trowable Manager Input
+	if Input.is_action_just_pressed("switch_throwable_next"):
+		ThrowableManager.switch_throwable_next()
+	elif Input.is_action_just_pressed("switch_throwable_prev"):
+		ThrowableManager.switch_throwable_prev()
+	
+	# Dash input
 	if not is_dashing and can_dash and Input.is_action_just_pressed("dash"):
-		print("🌀 Dash input detected!")
+		# print("🌀 Dash input detected!")
 		start_dash()
 		
 	if is_dashing:
 		ghost_timer -= delta
 		if ghost_timer <= 0:
-			print("👻 Attempting to spawn ghost")
+			# print("👻 Attempting to spawn ghost")
 			spawn_ghost()
 			ghost_timer = ghost_spawn_interval
 
-	# 📊 Debug UI: speed & jumps
+	# Manage UI 
 	speed_label.text = str(round(self.velocity.x))
 	jump_label.text = "Jumps: " + str(jumps_remaining)
+	var shuriken_cooldown_display := ""
+	for i in ShurikenManager.cooldowns:
+		if i > 0.0:
+			shuriken_cooldown_display = str(round(i * 100.0) / 100.0)
+			break
+	if shuriken_cooldown_display != "":
+		shuriken_label.text = "Shurikens: %d | %s" % [ShurikenManager.available, shuriken_cooldown_display]
+	else:
+		shuriken_label.text = "Shurikens: %d" % ShurikenManager.available
+	
+	var type = ThrowableManager.get_current_throwable_type()
+	var name = ThrowableManager.get_current_throwable_name()
+	var amount = ThrowableManager.get_throwable_count(type)
+	var cooldown = ThrowableManager.get_throwable_cooldown(type)
+
+	var throwable_cooldown_display := ""
+	if cooldown > 0.0:
+		throwable_cooldown_display = " | %.2f" % cooldown
+
+	throwable_label.text = "%s: %d%s" % [name, amount, throwable_cooldown_display]
 
 	# 🎞️ Animation logic (unless attacking or dashing)
 	if not is_attacking and not is_dashing:
@@ -154,13 +184,17 @@ func _physics_process(delta):
 	if was_on_floor and not is_on_floor():
 		if jumps_remaining == max_jumps:
 			jumps_remaining -= 1
-			print("💨 Walked off ledge — used one jump")
+			# print("💨 Walked off ledge — used one jump")
 
 	# 🧠 Save grounded state for next frame
 	was_on_floor = is_on_floor()
 
 	# 🔄 Restart level
 	if Input.is_action_just_pressed("restart_level"):
+		Engine.time_scale = 1.0
+		ThrowableManager.replenish_all()
+		ShurikenManager.replenish_all()
+		print("✅ Time and resources fully restored")
 		get_tree().reload_current_scene()
 		
 	# Megacrit after dash
@@ -169,6 +203,30 @@ func _physics_process(delta):
 
 	# 🕹️ Finally: apply movement!
 	move_and_slide()
+
+# Visual updates, inputs like joystick aiming, timers
+func _process(delta):
+	update_aiming(delta)
+
+func start_attack():
+	if is_attacking: # Check if player already in attack
+		return
+
+	is_attacking = true
+	
+	# Activate hitbox only during attack
+	sword_shape.disabled = false
+	sword_hitbox.monitoring = true # Enable collisions for this attack
+
+	# Play attack animation
+	sprite.play("attack")
+	
+	await get_tree().create_timer(0.1).timeout  # ← match animation length
+	# Deactivate hitbox
+	sword_hitbox.monitoring = false # Disable immediately after hit window
+	sword_shape.disabled = true
+	await get_tree().create_timer(0.2).timeout  # Let animation finish
+	is_attacking = false
 
 func start_dash():
 	print("⚡ Starting Dash")
@@ -205,6 +263,9 @@ func play_dash_animation():
 			print("⚠️ No 'dash' animation found!")
 
 func spawn_ghost():
+	if is_queued_for_deletion():
+		return
+
 	# Make sure GhostScene is loaded
 	if not GhostScene:
 		push_error("GhostScene not assigned or failed to preload")
@@ -230,5 +291,57 @@ func spawn_ghost():
 	else:
 		push_warning("Invalid sprite_frames or animation for ghost effect.")
 
+func update_aiming(delta: float) -> void:
+	var aim_input := Vector2(
+		Input.get_action_strength("aim_right") - Input.get_action_strength("aim_left"),
+		Input.get_action_strength("aim_down") - Input.get_action_strength("aim_up")
+	)
+	
+	var drawer = $TrajectoryDrawer
+	
+	if aim_input.length() > 0.2:
+		is_aiming = true
+		aiming_target.visible = true
+		drawer.set_visible_with_fade(true)
+		aim_input = aim_input.normalized()
+		aiming_target.global_position = global_position + aim_input * aim_radius
+		
+		var offset = aim_input * 62
+		aiming_target.position = offset
+		drawer.target_position = global_position + offset
+
+	else:
+		# If stick is idle, snap to forward and hide
+		is_aiming = false
+		aiming_target.visible = false
+		drawer.is_visible = false # Hide inststly
+		drawer.set_visible_with_fade(false)
+		aiming_target.global_position = global_position + Vector2(facing_direction, -0.3).normalized() * aim_radius
+
+#func throw_item():
+	#if not DecoyScene:
+		#return
+	#
+	#var decoy = DecoyScene.instantiate()
+	#decoy.global_position = global_position
+	#
+	## Aim direction
+	## var aim_vector: Vector2 = aiming_target.global_position - global_position
+	## var throw_speed: float = 800.0  # Must match trajectory_drawer
+	#var throw_velocity: Vector2 = (aiming_target.global_position - decoy.global_position).normalized() * THROW_SPEED
+	##var throw_velocity: Vector2 = aim_vector.normalized() * THROW_SPEED
+#
+	## Add decoy to scene first
+	#get_tree().current_scene.add_child(decoy)
+#
+	## Physics tuning — make sure it's fully under our control
+	#decoy.linear_damp = 0.0
+	#decoy.angular_damp = 1.0
+	#decoy.gravity_scale = 1.0
+	#decoy.linear_velocity = throw_velocity
+#
+	#print("Item thrown with velocity: ", throw_velocity)
+
+		
 func is_in_megacrit_window() -> bool:
 	return time_since_dash < megacrit_window

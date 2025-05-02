@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://dhnri2a2ac7ma"]
+
+[ext_resource type="Script" uid="uid://eqo8fo7j3wkc" path="res://Scenes/VFX/shuriken_ghost.gd" id="1_732vn"]
+
+[node name="ShurikenGhost" type="Node2D"]
+script = ExtResource("1_732vn")
+
+[node name="ShurikenSprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.54902)

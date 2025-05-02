@@ -1,0 +1,41 @@
+[gd_scene load_steps=6 format=3 uid="uid://col8m60ccqeh0"]
+
+[ext_resource type="Script" uid="uid://8aykgpeg2k3g" path="res://Scripts/Weapons/throwable_decoy.gd" id="1_bdeoy"]
+[ext_resource type="Texture2D" uid="uid://nb1wuhaqndcs" path="res://Sprites/weapons/weapon-decoy-01.png" id="2_bdeoy"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wkgp4"]
+size = Vector2(16, 16)
+
+[sub_resource type="Curve" id="Curve_10fje"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.5, 0.764045), -1.26939, -1.26939, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_t5e7u"]
+offsets = PackedFloat32Array(0, 0.377246, 0.664671, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.983948, 0.78226, 0.160569, 1, 1, 0.462745, 0.247059, 1, 1, 0.482353, 0, 0)
+
+[node name="DecoyBody" type="RigidBody2D"]
+collision_layer = 2
+script = ExtResource("1_bdeoy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.361111, 0.361111)
+texture = ExtResource("2_bdeoy")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 2)
+shape = SubResource("RectangleShape2D_wkgp4")
+
+[node name="FuseParticle" type="CPUParticles2D" parent="."]
+position = Vector2(8, -7)
+rotation = 2.3451
+amount = 64
+lifetime = 0.3
+preprocess = 0.1
+direction = Vector2(0, -1)
+spread = 40.0
+gravity = Vector2(0, 200)
+initial_velocity_min = 50.0
+initial_velocity_max = 80.0
+scale_amount_curve = SubResource("Curve_10fje")
+color_ramp = SubResource("Gradient_t5e7u")

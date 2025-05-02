@@ -24,9 +24,9 @@ func show_crit(custom_text: String = "NO VALUE!"):
 	# 🎨 Color and size based on type of crit
 	if custom_text == "MEGACRIT!!!":
 		label.add_theme_color_override("font_color", Color("ff4444"))  # Bold red for mega crit
-		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))   # White outline
+		label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))   # Black outline
 		label.add_theme_constant_override("outline_size", 8)           # Stroke thickness
-		label.add_theme_font_size_override("font_size", 32)
+		label.add_theme_font_size_override("font_size", 28)
 	else:
 		label.add_theme_color_override("font_color", Color("FFD700"))  # Gold for normal crit
 		label.add_theme_font_size_override("font_size", 24)

@@ -1,0 +1,45 @@
+[gd_scene load_steps=6 format=3 uid="uid://b6hm5soynq5sq"]
+
+[ext_resource type="Script" uid="uid://c1p44lrnms8x" path="res://Scenes/VFX/blast_effect.gd" id="1_kf800"]
+[ext_resource type="Shader" uid="uid://b4bx2vyl0e2v0" path="res://Shaders/blast_effect.gdshader" id="2_rbrtp"]
+
+[sub_resource type="Curve" id="Curve_kf800"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.7, 0.7), -1.12715, -1.12715, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Gradient" id="Gradient_kf800"]
+offsets = PackedFloat32Array(0, 0.263473, 0.730539, 1)
+colors = PackedColorArray(1, 0.819608, 0, 1, 1, 0.415686, 0.0901961, 1, 1, 0.0862745, 0.0117647, 1, 1, 0, 0, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rbrtp"]
+shader = ExtResource("2_rbrtp")
+shader_parameter/radius = 600.0
+shader_parameter/thickness = 0.35
+shader_parameter/progress = 0.0
+shader_parameter/distortion_strength = 0.05
+
+[node name="BlastEffect" type="Node2D"]
+script = ExtResource("1_kf800")
+
+[node name="BlastParticles" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 360
+lifetime = 2.2
+one_shot = true
+explosiveness = 1.0
+lifetime_randomness = 0.25
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 400)
+initial_velocity_min = 450.0
+initial_velocity_max = 600.0
+scale_amount_curve = SubResource("Curve_kf800")
+color_ramp = SubResource("Gradient_kf800")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_rbrtp")
+offset_left = -288.0
+offset_top = -290.0
+offset_right = 290.0
+offset_bottom = 288.0
+color = Color(1, 1, 1, 0.745098)

@@ -1,0 +1,41 @@
+[gd_scene load_steps=8 format=3 uid="uid://c3tbx5c3dk0k2"]
+
+[ext_resource type="Script" uid="uid://ctkttmgujh8cc" path="res://Scripts/shuriken.gd" id="1_v6fm7"]
+[ext_resource type="Texture2D" uid="uid://c4qj8lhd3jdoy" path="res://Sprites/weapons/weapon-shuriken-01.png" id="2_lmnj0"]
+[ext_resource type="Texture2D" uid="uid://b3tmkvgkvaarj" path="res://Sprites/weapons/weapon-shuriken-02.png" id="3_xce0f"]
+[ext_resource type="Texture2D" uid="uid://f8xv7y5xyw3w" path="res://Sprites/weapons/weapon-shuriken-03.png" id="4_me7my"]
+[ext_resource type="Texture2D" uid="uid://dl4iso1gmfax2" path="res://Sprites/weapons/weapon-shuriken-04.png" id="5_70kvu"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_me7my"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_lmnj0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_xce0f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_me7my")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_70kvu")
+}],
+"loop": true,
+"name": &"spin",
+"speed": 30.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xr0qw"]
+
+[node name="Node2D" type="Area2D"]
+script = ExtResource("1_v6fm7")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_me7my")
+animation = &"spin"
+frame = 3
+frame_progress = 0.192578
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_xr0qw")

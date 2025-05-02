@@ -1,4 +1,4 @@
-extends "res://Scenes/enemy_class.gd"
+extends "res://Scripts/enemy_class.gd"
 
 # =============================
 # 🪵 dummy.gd

@@ -56,15 +56,16 @@ enum State { IDLE, PATROL, AGGRO, STUNNED, DEAD }
 var current_state: State = State.PATROL
 
 # -- Preloaded scenes --
-var HealthBarScene := preload("res://Scenes/ui/HealthBar.tscn")
-var DamageLabelScene := preload("res://Scenes/ui/DamageLabel.tscn")
-var CritLabelScene := preload("res://Scenes/ui/CritLabel.tscn")
+var HealthBarScene := preload("res://Scenes/UI/HealthBar.tscn")
+var DamageLabelScene := preload("res://Scenes/UI/DamageLabel.tscn")
+var CritLabelScene := preload("res://Scenes/UI/CritLabel.tscn")
 var GibScene := preload("res://Scenes/Gib.tscn")  # 🧠 Gib (split body) prefab
 
 @onready var health_bar: ProgressBar = null  # Will be assigned on spawn
 @onready var ray_ground = $RayCast2D_Ground
 @onready var ray_wall = $RayCast2D_Wall
 @onready var foe_sprite = $Visuals/FoeAnimatedSprite
+@onready var pos_label: Label = $Debugging/PositionLabel
 var hurt_box: Area2D  # Will be set in _ready()
 
 func set_state(new_state: State) -> void:
@@ -106,6 +107,10 @@ func _ready() -> void:
 	# Initialize sprite
 	if foe_sprite:
 		foe_sprite.play("walk")
+
+func _process(delta):
+	if pos_label:
+		pos_label.text = str(global_position.round())
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
@@ -253,6 +258,10 @@ func die() -> void:
 	print("[Enemy] Starting death sequence")
 	print("[Enemy] Hit direction:", hit_direction)
 	
+	# Hide health bar immediately
+	if health_bar:
+		health_bar.visible = false
+	
 	# Disable AI raycasts
 	ray_ground.enabled = false
 	ray_wall.enabled = false
@@ -282,7 +291,7 @@ func die() -> void:
 	# Calculate launch force based on damage taken
 	var knockback_ratio: float = clamp(float(last_damage_received) / float(max_hp), 0.0, 1.0)
 	# var scaled_ratio := pow(knockback_ratio, 3.0)  # Exponential scale
-	var scaled_ratio := knockback_ratio  # Linear scale
+	var scaled_ratio := pow(knockback_ratio, 2.0)  # Scale table below
 	# Knockback Scaling Curves Reference:
 	# Curve        | Formula                      | Effect
 	# ------------ | ---------------------------- | -------------------------------
@@ -297,24 +306,33 @@ func die() -> void:
 	velocity = Vector2(death_launch_x, death_launch_y)
 
 	print("[Enemy] Death launch applied - X:", death_launch_x, " Y:", death_launch_y)
-	#var death_launch_x = 200 * hit_direction  # same direction where the hit was going
-	#var death_launch_y = -400  # strong upward launch
-	#velocity = Vector2(death_launch_x, death_launch_y)
-	#print("[Enemy] Death launch applied - X:", death_launch_x, " Y:", death_launch_y)
-	#print("[Enemy] Current velocity:", velocity)
-	
+
 	# Set death state after applying launch
 	set_state(State.DEAD)
 	is_dead = true
 
 	# Queue free after falling for 3 seconds
-	await get_tree().create_timer(3.0).timeout
+	await get_tree().create_timer(1.8).timeout
 	queue_free()
 
 func die_with_gore():
 	var last_enemy_direction: int = direction
 	direction = 0 # stop AI movement
-	print("\n💀 GORE DEATH TRIGGERED | Last Direction", last_enemy_direction)
+	# print("\n💀 GORE DEATH TRIGGERED | Last Direction", last_enemy_direction)
+	
+	# Hide health bar
+	if health_bar:
+		health_bar.visible = false
+	
+	# Disable AI raycasts
+	ray_ground.enabled = false
+	ray_wall.enabled = false
+	
+	# Disable all collisions
+	for child in get_children():
+		if child is CollisionShape2D:
+			child.set_deferred("disabled", true)
+			print("[Enemy] Disabled collision shape:", child.name)
 	
 	if not gib_texture_left or not gib_texture_right:
 		print("⚠️ No gib textures assigned!")
@@ -324,6 +342,15 @@ func die_with_gore():
 	# 👁️ Cinematic Zoom & Super Slow Motion
 	var player = get_tree().get_first_node_in_group("player")
 	var player_camera: Camera2D = null
+	
+	# 🎮 Trigger controller vibration (if supported)
+	var joypad_id := 0  # First connected controller
+	if Input.is_joy_known(joypad_id):
+		# Left motor: low rumble, Right motor: high rumble
+		Input.start_joy_vibration(joypad_id, 0.5, 1.0, 0.5)
+		print("🎮 Controller vibration started (GORE!)")
+	else:
+		print("⚠️ No known controller connected")
 
 	if player:
 		player_camera = player.get_node_or_null("PlayerCamera")
@@ -333,8 +360,7 @@ func die_with_gore():
 		print("🐌 Super slo-mo time started")
 
 		if player_camera:
-			# 📴 Disable smoothing before zooming
-			player_camera.position_smoothing_speed = 25.0
+			player_camera.position_smoothing_speed = 25.0 # Disable smoothing before zooming
 			player_camera.set_offset(Vector2.ZERO)
 			player_camera.position = Vector2.ZERO  # Ensure camera centers on player
 			print("🔍 Zooming in on player camera")
@@ -393,7 +419,8 @@ func die_with_gore():
 	Engine.time_scale = 1.0
 	print("✅ Time fully restored")
 
-	# Step 6: Remove node
+	# Step 6: Remove node  after falling for 3 seconds
+	await get_tree().create_timer(1.0).timeout
 	print("🧹 Removing enemy node")
 	queue_free()
 

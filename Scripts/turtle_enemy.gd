@@ -1,4 +1,4 @@
-extends "res://Scenes/enemy_class.gd"
+extends "res://Scripts/enemy_class.gd"
 
 # =============================
 # 🐢 turtle_enemy.gd
@@ -21,8 +21,8 @@ func _ready() -> void:
 	super._ready()  # Initialize base class first
 	
 	# -- Gore support --
-	gib_texture_left = preload("res://sprites/foes/gibs/turtle-left.png")
-	gib_texture_right = preload("res://sprites/foes/gibs/turtle-right.png")
+	gib_texture_left = preload("res://Sprites/foes/gibs/turtle-left.png")
+	gib_texture_right = preload("res://Sprites/foes/gibs/turtle-right.png")
 	
 	max_hp = TURLE_MAX_HP
 	current_hp = max_hp
